@@ -111,6 +111,52 @@ alert("Bad URL");
 return false;
 });
  
+	
+	// Add support for YOURLS URL shortener as well as bit.ly.
+		      function yourls_shorten(url, site, site_signature, short_keyword) {
+
+			  api_data = {action:"shorturl",
+				      signature:site_signature,
+				      url:url,
+				      format:"jsonp"};
+			  if (short_keyword && short_keyword.length > 0) {
+			      api_data.keyword = short_keyword;
+			  }
+			  
+			  $.ajax({
+			      url:site,
+			      data: api_data,
+			      dataType:"jsonp",
+			      success:function(v) {
+				  var status = v.status;
+				  if (status == "success") {				      
+				      var shorturl = v.shorturl;
+				      $("#result").html('<a href="'+shorturl+'" target="_blank">'+shorturl+'</a>');
+				  } else {
+				      $("#result").html('Error: '+v.message);
+				  }
+			      }
+			  });
+		      }
+		      
+		      $("#shortlink").click(function()
+					     {
+						 var url=$("#url").val();
+						 var short_keyword = $("#short_keyword").val();
+						 var urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+						 var urltest=urlRegex.test(url);
+						 if(urltest)
+						 {
+						     $("#result").show();
+						     yourls_shorten(url, "http://YOURURLS.LINK/yourls-api.php","YOUR_API_TOKEN", short_keyword);
+						     $("#url").focus();
+						 }
+						 else
+						 {
+						     alert("Bad URL");
+						 }
+						 return false;
+			     			 });
  
 });
 </script>
